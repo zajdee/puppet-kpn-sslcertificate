@@ -38,8 +38,8 @@ It is also possible to list all Local Machine certificates using:
 ### Setup Requirements
 
 This module requires:
-- [puppetlabs-stdlib](https://github.tooling.kpn.org/kpn-puppet-forge/puppet-puppetlabs-stdlib)
-- [puppetlabs-powershell](https://github.tooling.kpn.org/kpn-puppet-forge/puppet-puppetlabs-powershell)
+- [puppetlabs-stdlib](https://github.com/puppetlabs/puppetlabs-stdlib.git)
+- [puppetlabs-powershell](https://github.com/puppetlabs/puppetlabs-powershell.git)
 
 ### What sslcertificate affects
 
@@ -60,9 +60,6 @@ This module will install certificates into your Windows key stores. It is also p
     }
 ```
 
-  It is also possible to use hiera. sslcertificate has been added to profile_windows as: profile_windows::sslcertificate.
-  Please read the [README_sslcertifciate.md](https://github.tooling.kpn.org/kpn-puppet-forge/puppet-kpn-profile_windows/blob/master/README_sslcertifciate.md) of profile_windows for more details on using hiera.
-  
 ## Usage
 
 ### Parameters
