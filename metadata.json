@@ -1,6 +1,6 @@
 {
   "name": "kpn-sslcertificate",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "kpn",
   "summary": "Module to manage SSL Certificates on Windows Server 2008 and upwards",
   "license": "MIT",

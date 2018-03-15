@@ -1,3 +1,6 @@
+2018-03-15 Release 1.0.1
+- updated README.md
+
 2018-03-13 Release 1.0.0
 - sslcertificate has been rewriten als a provider.
  - sslcertificate now has new/different parameters. Please check the README.MD
