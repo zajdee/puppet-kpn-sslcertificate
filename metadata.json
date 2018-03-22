@@ -1,6 +1,6 @@
 {
   "name": "kpn-sslcertificate",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "kpn",
   "summary": "Module to manage SSL Certificates on Windows Server 2008 and upwards",
   "license": "MIT",
@@ -30,7 +30,7 @@
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 4.7.0 < 5.0.0"
+      "version_requirement": ">= 4.7.0 < 6.0.0"
     }
   ],
   "kpn_quality_label": "A",

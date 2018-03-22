@@ -1,3 +1,6 @@
+2018-03-21 Release 1.0.2
+- Add support for Puppet 5
+
 2018-03-15 Release 1.0.1
 - updated README.md
 

@@ -38,8 +38,8 @@ It is also possible to list all Local Machine certificates using:
 ### Setup Requirements
 
 This module requires:
-- [puppetlabs-stdlib](https://github.com/puppetlabs/puppetlabs-stdlib.git)
-- [puppetlabs-powershell](https://github.com/puppetlabs/puppetlabs-powershell.git)
+- [puppetlabs-stdlib](https://github.com/puppetlabs/puppetlabs-stdlib)
+- [puppetlabs-powershell](https://github.com/puppetlabs/puppetlabs-powershell)
 
 ### What sslcertificate affects
 
