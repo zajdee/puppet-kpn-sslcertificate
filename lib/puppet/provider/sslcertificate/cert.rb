@@ -118,7 +118,7 @@ Puppet::Type.type(:sslcertificate).provide(:cert) do
           issuer: issuer,
           subject: subject,
           valid_till: valid_till,
-          valid_from: valid_from
+          valid_from: valid_from,
         }
         inst = new(certificate_hash)
         instances << inst

@@ -31,13 +31,13 @@ example = {
           CG19ndeNIdn8FCCqwkXfP+cAslHkwvgFuXkajDTznlvkN1trSt8sV4pAWja63XVECDdCcAz+3F4h
           oKOKwJCcaNpQ5kUQR3i2TtJlycM33+FCY7BXN0Ute4qcvwXqZVUz9zkQxSgqIXobisQk+T8VyJoV
           IPVVYpbtbZNQvOSqeK3Zywplh6ZmwcSBo3c6WB4L7oOLnR7SUqTMHW+wmG2UMbX4cQrcufx9MmDm
-          66+KAQ=='
+          66+KAQ==',
 }
 
 describe type_class do
   let :params do
     [
-      :path
+      :path,
     ]
   end
 
@@ -46,7 +46,7 @@ describe type_class do
       :ensure,
       :format,
       :password,
-      :certificate_content
+      :certificate_content,
     ]
   end
 

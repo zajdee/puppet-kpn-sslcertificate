@@ -20,18 +20,18 @@ Puppet Module to manage Windows certificates.
 
 ## Module Description
 
-This sslcertificate module will allow you to install and remove your certificates on Windows machines.  
-It can manage pfx, cer and crt certificates.  
+This sslcertificate module will allow you to install and remove your certificates on Windows machines.
+It can manage pfx, cer and crt certificates.
 
-The module is based/uses code from the following module:  
-- voxpupuli-puppet-sslcertificate: https://github.com/voxpupuli/puppet-sslcertificate  
+The module is based/uses code from the following module:
+- voxpupuli-puppet-sslcertificate: https://github.com/voxpupuli/puppet-sslcertificate
 
-Although we borrowed the powershell scripts from voxpupuli, this module does not yet support all certificate types that voxpupuli does.  
-This module uses Hiera to install certificates so you will have to convert your certificate file to a Base64 string.  
+Although we borrowed the powershell scripts from voxpupuli, this module does not yet support all certificate types that voxpupuli does.
+This module uses Hiera to install certificates so you will have to convert your certificate file to a Base64 string.
 
-It is also possible to list all Local Machine certificates using:  
-- puppet resource sslcertificate  
-- puppet resource sslcertificate <thumbprint>  
+It is also possible to list all Local Machine certificates using:
+- puppet resource sslcertificate
+- puppet resource sslcertificate <thumbprint>
 
 ## Setup
 
@@ -89,7 +89,7 @@ Default: nil<br />
 Values: 'cer', 'crt' or 'pfx'<br />
 Description: This is the format of the certificate.<br />
 
-##### exportable
+#### exportable
 Type: boolean<br />
 Default: true<br />
 Values: true or false<br />
@@ -135,7 +135,7 @@ To remove a certificate:
 ## Reference
 
 ### Provider
-- sslcertificate 
+- sslcertificate
 
 
 ## Limitations
