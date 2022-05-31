@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Provider # cert.rb
 
 Puppet::Type.type(:sslcertificate).provide(:cert) do
@@ -7,13 +9,13 @@ Puppet::Type.type(:sslcertificate).provide(:cert) do
   mk_resource_methods
 
   commands powershell:
-               if File.exist?("#{ENV['SYSTEMROOT']}\\sysnative\\WindowsPowershell\\v1.0\\powershell.exe")
-                 "#{ENV['SYSTEMROOT']}\\sysnative\\WindowsPowershell\\v1.0\\powershell.exe"
-               elsif File.exist?("#{ENV['SYSTEMROOT']}\\system32\\WindowsPowershell\\v1.0\\powershell.exe")
-                 "#{ENV['SYSTEMROOT']}\\system32\\WindowsPowershell\\v1.0\\powershell.exe"
-               else
-                 'powershell.exe'
-               end
+    if File.exist?("#{ENV['SYSTEMROOT']}\\sysnative\\WindowsPowershell\\v1.0\\powershell.exe")
+      "#{ENV['SYSTEMROOT']}\\sysnative\\WindowsPowershell\\v1.0\\powershell.exe"
+    elsif File.exist?("#{ENV['SYSTEMROOT']}\\system32\\WindowsPowershell\\v1.0\\powershell.exe")
+      "#{ENV['SYSTEMROOT']}\\system32\\WindowsPowershell\\v1.0\\powershell.exe"
+    else
+      'powershell.exe'
+    end
 
   def initialize(value = {})
     super(value)
@@ -30,9 +32,9 @@ Puppet::Type.type(:sslcertificate).provide(:cert) do
     @property_hash[:ensure] == :present
   end
 
-  def self.write_cer_to_cert_file(certificate_content)
+  def self.write_to_cert_file(format, certificate_content)
     # This creates a plaintext certificate file to be imported
-    cert_file = 'c:/windows/temp/cert_file.cer'
+    cert_file = "c:/windows/temp/cert_file.#{format}"
     out_file = File.new(cert_file, 'w')
     out_file.puts(certificate_content.to_s)
     out_file.close
@@ -47,10 +49,19 @@ Puppet::Type.type(:sslcertificate).provide(:cert) do
   def create
     # create a certiticate
 
+    format = resource[:format]
+    cert_file = 'c:/windows/temp/cert_file'
+
     case resource[:format]
     when :cer
       # create .cer certificate
-      self.class.write_cer_to_cert_file(resource[:certificate_content])
+      self.class.write_to_cert_file(resource[:format], resource[:certificate_content])
+    when :pem
+      # create .pem certificate and convert to pfx
+      self.class.write_to_cert_file(resource[:format], resource[:certificate_content])
+      system("cmd /c openssl pkcs12 -export -out #{cert_file}.pfx  -passout pass:#{resource[:password]}  -inkey #{cert_file}.pem  -in #{cert_file}.pem -passin pass:#{resource[:password]}")
+      powershell("Remove-Item #{cert_file}.pem")
+      format = 'pfx'
     when :crt
       # create .crt certificate
       self.class.write_base64_to_cert_file(resource[:format], resource[:certificate_content])
@@ -59,12 +70,12 @@ Puppet::Type.type(:sslcertificate).provide(:cert) do
       self.class.write_base64_to_cert_file(resource[:format], resource[:certificate_content])
     end
 
-    key_storage_flags = resource[:exportable] ? 'Exportable`,PersistKeySet' : 'PersistKeySet'
+    key_storage_flags = resource[:exportable] ? 'Exportable,PersistKeySet,MachineKeySet' : 'PersistKeySet,MachineKeySet'
 
-    self.class.run_import_certificate(resource[:format], resource[:password], key_storage_flags, resource[:name].split('\\')[1], resource[:name].split('\\')[2])
+    self.class.run_import_certificate(format, resource[:password], key_storage_flags, resource[:name].split('\\')[1], resource[:name].split('\\')[2])
 
     # delete the temporary cert_file
-    powershell("Remove-Item c:/windows/temp/cert_file.#{resource[:format]}")
+    powershell("Remove-Item #{cert_file}.#{format}")
   end
 
   def destroy
@@ -98,14 +109,14 @@ Puppet::Type.type(:sslcertificate).provide(:cert) do
       case var[0]
       when 'PSPath    '
         if var[3]
-          name       = var[3]
-          path       = var[3]
+          name = var[3]
+          path = var[3]
           thumbprint = var[3].split('\\')[2]
         end
       when 'Subject   '
-        subject    = var[1]
+        subject = var[1]
       when 'Issuer    '
-        issuer     = var[1]
+        issuer = var[1]
       when 'NotBefore '
         valid_from = line.split(' ')[2]
       when 'NotAfter  '
@@ -129,7 +140,7 @@ Puppet::Type.type(:sslcertificate).provide(:cert) do
 
   def self.prefetch(resources)
     certificates = instances
-    resources.keys.each do |name|
+    resources.each_key do |name|
       if (provider = certificates.find { |certificate| certificate.name == name })
         resources[name].provider = provider
       end
@@ -139,56 +150,73 @@ Puppet::Type.type(:sslcertificate).provide(:cert) do
   def self.run_import_certificate(format, password, key_storage_flags, store_dir, thumbprint)
     import_certificate = <<-IMPORT
   param (
-    [string]$location = "c:/windows/temp",
-    [string]$name = "cert_file.#{format}",
-    [string]$password = "#{password}",
-    [string]$key_storage_flags = "#{key_storage_flags}",
-    [string]$store_dir = "#{store_dir}",
-    [string]$root_store = "LocalMachine",
-    [string]$thumbprint = "#{thumbprint}"
+    [string]$location = 'c:/windows/temp',
+    [string]$name = 'cert_file.#{format}',
+    [string]$password = '#{password}',
+    [string]$key_storage_flags = '#{key_storage_flags}',
+    [string]$store_dir = '#{store_dir}',
+    [string]$store_type = 'LocalMachine',
+    [string]$thumbprint = '#{thumbprint}'
   )
 
-  $certname = "$location/$name"
-  $cert = gi $certname
+  $certname = "${location}/${name}"
+  $cert = Get-Item $certname
 
   try {
     switch -regex ($cert.Extension.ToUpper()) {
-      ".CER|.DER|.P12" {
+      '.CER|.DER|.P12' {
         $pfx = new-object System.Security.Cryptography.X509Certificates.X509Certificate2
-        $pfx.Import("$certname","$password","$key_storage_flags")
+        $pfx.Import($certname,$password,$key_storage_flags)
       }
-      ".CRT" {
+      '.CRT' {
         $pfx = new-object System.Security.Cryptography.X509Certificates.X509Certificate2
-        $pfx.Import([System.IO.File]::ReadAllBytes("$certname"))
+        $pfx.Import([System.IO.File]::ReadAllBytes($certname))
       }
-      ".P7B|.SST" {
+      '.P7B|.SST' {
         $pfx = new-object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
-        $pfx.Import([System.IO.File]::ReadAllBytes("$certname"))
+        $pfx.Import([System.IO.File]::ReadAllBytes($certname))
       }
-      ".PFX" {
+      '.PFX' {
         $pfx = new-object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
-        $pfx.import("$certname","$password","$key_storage_flags")
+        $pfx.Import($certname,$password,$key_storage_flags)
       }
     }
   } catch {exit 13}
 
-  $store = new-object System.Security.Cryptography.X509Certificates.X509Store("$store_dir","$root_store")
-  $store.open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+  $cert_store = new-object System.Security.Cryptography.X509Certificates.X509Store($store_dir,$store_type)
+  $cert_store.open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
 
-  $intermediatestore = new-object System.Security.Cryptography.X509Certificates.X509Store("CA","$root_store")
-  $intermediatestore.open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+  $intermediate_store = new-object System.Security.Cryptography.X509Certificates.X509Store('CA',$store_type)
+  $intermediate_store.open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
 
-  foreach($certif in $pfx) {
-    if($certif.Thumbprint -ne "$thumbprint") {
-      $intermediatestore.Add($certif)
+  $root_store = new-object System.Security.Cryptography.X509Certificates.X509Store('Root',$store_type)
+  $root_store.open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+
+  foreach($certificate in $pfx) {
+    if ($certificate.Thumbprint -eq $thumbprint)
+    {
+      $cert_store.Add($certificate)              # this is the actual cerificate we want
     }
-    else {
-      $store.Add($certif)
+    else
+    {
+      # contains more certs (not matching the thumb print), e.g. a cert chain
+      # import root and intermediate certs
+      if ($certificate.Subject -eq $certificate.Issuer)
+      {
+        # the self-signed root cert from the chain
+        $root_store.Add($certificate)            # the root CA cert to the trusted root store
+      }
+      else
+      {
+        # other certs from the chain (not self-signed)
+        $intermediate_store.Add($certificate)    # non root intermediate certs to trusted intermediate store
+      }
     }
   }
-
-  $store.close()
-  IMPORT
+  $root_store.close()
+  $intermediate_store.close()
+  $cert_store.close()
+    IMPORT
     powershell([import_certificate])
   end
 end

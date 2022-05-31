@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Type # sslcertificate.rb
 Puppet::Type.newtype(:sslcertificate) do
   desc 'Puppet type that manages Windows certificates'
@@ -16,7 +18,7 @@ Puppet::Type.newtype(:sslcertificate) do
 
   newproperty(:format) do
     desc 'The certificate format - This is only used to create a certificate and is therefore not added to the certificate properties'
-    newvalues('cer', 'crt', 'pfx')
+    newvalues('cer', 'crt', 'pfx', 'pem')
     def insync?(_is)
       true
     end
@@ -25,6 +27,9 @@ Puppet::Type.newtype(:sslcertificate) do
   newproperty(:certificate_content) do
     desc 'The certificate content - This is only used to create a certificate and is therefore  not added to the certificate properties'
     validate do |value|
+    end
+    munge do |value|
+      value.gsub('  ', '')
     end
     def insync?(_is)
       true

@@ -21,7 +21,7 @@ Puppet Module to manage Windows certificates.
 ## Module Description
 
 This sslcertificate module will allow you to install and remove your certificates on Windows machines.
-It can manage pfx, cer and crt certificates.
+It can manage pfx, cer, crt and pem certificates.
 
 The module is based/uses code from the following module:
 - voxpupuli-puppet-sslcertificate: https://github.com/voxpupuli/puppet-sslcertificate
@@ -40,6 +40,9 @@ It is also possible to list all Local Machine certificates using:
 This module requires:
 - [puppetlabs-stdlib](https://github.com/puppetlabs/puppetlabs-stdlib)
 - [puppetlabs-powershell](https://github.com/puppetlabs/puppetlabs-powershell)
+
+If you want to manage pem certificates, you will need OpenSSL.
+OpenSSL.Light can be installed from this module by including the following code: `include sslcertificate`.
 
 ### What sslcertificate affects
 
@@ -89,7 +92,7 @@ Default: nil<br />
 Values: 'cer', 'crt' or 'pfx'<br />
 Description: This is the format of the certificate.<br />
 
-#### exportable
+##### exportable
 Type: boolean<br />
 Default: true<br />
 Values: true or false<br />
@@ -135,7 +138,7 @@ To remove a certificate:
 ## Reference
 
 ### Provider
-- sslcertificate
+- sslcertificate 
 
 
 ## Limitations
@@ -144,6 +147,7 @@ This module works on:
 - Windows 2008 R2
 - Windows 2012 R2
 - Windows 2016
+- Windows 2019
 
 
 ## Development

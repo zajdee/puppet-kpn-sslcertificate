@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 provider_resource = Puppet::Type.type(:sslcertificate)
@@ -10,7 +12,7 @@ describe provider_class do
     provider_resource.new(
       name: 'any_certificate',
       ensure: 'present',
-      path:  'LocalMachine\\Store\\670A1B2C3D4E5F89670A1B2C3D4E5F89ABCDEF89',
+      path: 'LocalMachine\\Store\\670A1B2C3D4E5F89670A1B2C3D4E5F89ABCDEF89',
       format: 'cer',
       password: 's@omeB1gSecr3t',
       certificate_content: 'MIIFyjCCA7KgAwIBAgIEAJiWjDANBgkqhkiG9w0BAQsFADBaMQswCQYDVQQGEwJOTDEeMBwGA1UE
@@ -68,12 +70,12 @@ NotAfter  : 5/10/2021 1:28:13 AM\n"
         provider.class.stubs(powershell: sslcertifs)
         provider.class.expects(:new)
                 .with(
-                  name:       'LocalMachine\\Root\\CDD4EEAE6000AC7F40C3802C171E30148030C072',
-                  path:       'LocalMachine\\Root\\CDD4EEAE6000AC7F40C3802C171E30148030C072',
-                  ensure:     :present,
+                  name: 'LocalMachine\\Root\\CDD4EEAE6000AC7F40C3802C171E30148030C072',
+                  path: 'LocalMachine\\Root\\CDD4EEAE6000AC7F40C3802C171E30148030C072',
+                  ensure: :present,
                   thumbprint: 'CDD4EEAE6000AC7F40C3802C171E30148030C072',
-                  issuer:     ' CN=Microsoft Root Certificate Authority, DC=microsoft, DC=com',
-                  subject:    ' CN=Microsoft Root Certificate Authority, DC=microsoft, DC=com',
+                  issuer: ' CN=Microsoft Root Certificate Authority, DC=microsoft, DC=com',
+                  subject: ' CN=Microsoft Root Certificate Authority, DC=microsoft, DC=com',
                   valid_from: '5/10/2001',
                   valid_till: '5/10/2021',
                 )

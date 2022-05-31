@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 type_class = Puppet::Type.type(:sslcertificate)
@@ -73,9 +75,10 @@ describe type_class do
       expect {
         correct = example
         type_class.new(correct)
-      }.not_to raise_error(Puppet::ResourceError, %r{})
+      }.not_to raise_error
     end
   end
+
   describe 'with incorrect values' do
     it 'with incorrect store in path' do
       expect {
@@ -84,6 +87,7 @@ describe type_class do
         type_class.new(incorrect_store)
       }.to raise_error(Puppet::ResourceError, %r{LocalMachine\\<store_dir>\\<thumbprint>})
     end
+
     it 'with incorrect thumbprint in path' do
       expect {
         incorrect_thumbprint = example.clone
@@ -91,6 +95,7 @@ describe type_class do
         type_class.new(incorrect_thumbprint)
       }.to raise_error(Puppet::ResourceError, %r{thumbprint of 40 hexadecimal numbers})
     end
+
     it 'with incorrect format' do
       expect {
         incorrect_format = example.clone
