@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 def clone_dependent_modules
   fixtures = YAML.load_file('.fixtures.yml')['fixtures']
   fixtures['repositories'].each do |module_name, value|
