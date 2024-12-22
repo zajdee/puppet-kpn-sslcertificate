@@ -59,8 +59,7 @@ Puppet::Type.type(:sslcertificate).provide(:cert) do
     when :pem
       # create .pem certificate and convert to pfx
       self.class.write_to_cert_file(resource[:format], resource[:certificate_content])
-      system("cmd /c openssl pkcs12 -help")
-      system("cmd /c echo openssl pkcs12 -export -out #{cert_file}.pfx  -passout pass:#{resource[:password]}  -inkey #{cert_file}.pem  -in #{cert_file}.pem -passin pass:#{resource[:password]}")
+      system("cmd /c openssl pkcs12 -export -out #{cert_file}.pfx  -passout pass:#{resource[:password]}  -inkey #{cert_file}.pem  -in #{cert_file}.pem -passin pass:#{resource[:password]}")
       powershell("Remove-Item #{cert_file}.pem")
       format = 'pfx'
     when :crt
